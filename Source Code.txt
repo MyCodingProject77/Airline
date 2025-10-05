@@ -1,0 +1,337 @@
+
+
+
+  Passenger
+
+
+  private void btnSave_Click(object sender, EventArgs e)
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand(
+        "INSERT INTO Passenger (Name, Email, Phone_Number, Date_Of_Birth, Passport_Number) " +
+        "VALUES (@Name, @Email, @Phone, @DOB, @Passport)", con);
+
+    cmd.Parameters.AddWithValue("@Name", txtName.Text);
+    cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
+    cmd.Parameters.AddWithValue("@Phone", txtPhone.Text);
+    cmd.Parameters.AddWithValue("@DOB", dtpDOB.Value.Date); // DateTimePicker control
+    cmd.Parameters.AddWithValue("@Passport", txtPassport.Text);
+
+    cmd.ExecuteNonQuery();
+    con.Close();
+    MessageBox.Show("Passenger Saved Successfully!");
+}
+
+
+
+private void LoadPassengers()
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand("SELECT * FROM Passenger", con);
+    SqlDataAdapter da = new SqlDataAdapter(cmd);
+    DataTable dt = new DataTable();
+    da.Fill(dt);
+    con.Close();
+
+    dataGridView1.DataSource = dt; // assuming you have a DataGridView
+}
+
+
+
+private void btnUpdate_Click(object sender, EventArgs e)
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand(
+        "UPDATE Passenger SET Name=@Name, Email=@Email, Phone_Number=@Phone, Date_Of_Birth=@Date_Of_Birth, Passport_Number=@Passport " +
+        "WHERE Passenger_ID=@PassengerID", con);
+
+    cmd.Parameters.AddWithValue("@PassengerID", int.Parse(txtPassengerID.Text));
+    cmd.Parameters.AddWithValue("@Name", txtName.Text);
+    cmd.Parameters.AddWithValue("@Email", txtEmail.Text);
+    cmd.Parameters.AddWithValue("@Phone", txtPhone.Text);
+    cmd.Parameters.AddWithValue("@Date_Of_Birth", dtpDOB.Value.Date);
+    cmd.Parameters.AddWithValue("@Passport", txtPassport.Text);
+
+    cmd.ExecuteNonQuery();
+    con.Close();
+    MessageBox.Show("Passenger Updated Successfully!");
+    LoadPassengers();
+}
+
+
+
+private void btnDelete_Click(object sender, EventArgs e)
+{
+    if (MessageBox.Show("Are you sure you want to delete this passenger?", 
+        "Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+    {
+        con.Open();
+        SqlCommand cmd = new SqlCommand("DELETE FROM Passenger WHERE Passenger_ID=@PassengerID", con);
+        cmd.Parameters.AddWithValue("@PassengerID", int.Parse(txtPassengerID.Text));
+        cmd.ExecuteNonQuery();
+        con.Close();
+
+        MessageBox.Show("Passenger Deleted Successfully!");
+        LoadPassengers();
+    }
+}
+
+
+
+private void btnAddNew_Click(object sender, EventArgs e)
+{
+    txtPassengerID.Clear();
+    txtName.Clear();
+    txtEmail.Clear();
+    txtPhone.Clear();
+    txtPassport.Clear();
+    dtpDOB.Value = DateTime.Today;
+}
+
+
+
+private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+{
+    if (e.RowIndex >= 0)
+    {
+        DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
+        txtPassengerID.Text = row.Cells["Passenger_ID"].Value.ToString();
+        txtName.Text = row.Cells["Name"].Value.ToString();
+        txtEmail.Text = row.Cells["Email"].Value.ToString();
+        txtPhone.Text = row.Cells["Phone_Number"].Value.ToString();
+        txtPassport.Text = row.Cells["Passport_Number"].Value.ToString();
+        dtpDOB.Value = Convert.ToDateTime(row.Cells["Date_Of_Birth"].Value);
+    }
+}
+
+
+
+
+
+  Booking
+
+  using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=AirlineDB;Integrated Security=True;TrustServerCertificate=True"))
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand(
+        "INSERT INTO Booking (Passenger_ID, Booking_Date, Total_Amount, Status) " +
+        "VALUES (@PassengerID, @BookingDate, @TotalAmount, @Status)", con);
+
+    cmd.Parameters.AddWithValue("@PassengerID", int.Parse(txtPassengerID.Text));
+    cmd.Parameters.AddWithValue("@BookingDate", dtpBookingDate.Value);
+    cmd.Parameters.AddWithValue("@TotalAmount", decimal.Parse(txtTotalAmount.Text));
+    cmd.Parameters.AddWithValue("@Status", cmbStatus.Text);
+
+    cmd.ExecuteNonQuery();
+    MessageBox.Show("Booking Saved Successfully!");
+}
+
+
+
+ using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=AirlineDB;Integrated Security=True;TrustServerCertificate=True"))
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand(
+        "UPDATE Booking SET Passenger_ID=@PassengerID, Booking_Date=@BookingDate, " +
+        "Total_Amount=@TotalAmount, Status=@Status WHERE Booking_ID=@BookingID", con);
+
+    cmd.Parameters.AddWithValue("@BookingID", int.Parse(txtBookingID.Text));
+    cmd.Parameters.AddWithValue("@PassengerID", int.Parse(txtPassengerID.Text));
+    cmd.Parameters.AddWithValue("@BookingDate", dtpBookingDate.Value);
+    cmd.Parameters.AddWithValue("@TotalAmount", decimal.Parse(txtTotalAmount.Text));
+    cmd.Parameters.AddWithValue("@Status", cmbStatus.Text);
+    
+
+    cmd.ExecuteNonQuery();
+    MessageBox.Show("Booking Updated Successfully!");
+}
+
+
+
+
+using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=AirlineDB;Integrated Security=True;TrustServerCertificate=True"))
+{
+    con.Open();
+    SqlCommand cmd = new SqlCommand("DELETE FROM Booking WHERE Booking_ID=@BookingID", con);
+    cmd.Parameters.AddWithValue("@BookingID", cmd.Parameters.AddWithValue("@BookingID", int.Parse(txtBookingID.Text)););
+
+    cmd.ExecuteNonQuery();
+    MessageBox.Show("Booking Deleted Successfully!");
+}
+
+
+
+ private void ClearForm()
+{
+    txtBookingID.Clear();
+    txtPassengerID.Clear();
+    txtTotalAmount.Clear();
+    cmbStatus.SelectedIndex = -1;
+    dtpBookingDate.Value = DateTime.Now;
+}
+
+
+
+using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=AirlineDB;Integrated Security=True;TrustServerCertificate=True"))
+{
+    con.Open();
+    SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Booking", con);
+    DataTable dt = new DataTable();
+    da.Fill(dt);
+    dataGridView1.DataSource = dt;
+}
+
+
+
+
+  SQL Database All Queries
+
+  CREATE DATABASE AirlineDB;
+
+USE AirlineDB;
+
+-- Airport table
+CREATE TABLE Airport (
+    Airport_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Location NVARCHAR(100),
+    Code NVARCHAR(10) UNIQUE
+);
+
+-- Passenger table
+CREATE TABLE Passenger (
+    Passenger_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) UNIQUE,
+    Phone_Number NVARCHAR(20),
+    Date_Of_Birth DATETIME,
+    Passport_Number NVARCHAR(50) UNIQUE
+);
+
+CREATE TABLE Flight (
+    Flight_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Origin_Airport_ID INT,
+    Destination_Airport_ID INT,
+    Flight_Number NVARCHAR(20) NOT NULL,
+    Departure_Date DATETIME,
+    Arrival_Date DATETIME,
+    Price DECIMAL(10,2),
+    CONSTRAINT FK_Flight_Origin FOREIGN KEY (Origin_Airport_ID) REFERENCES Airport(Airport_ID),
+    CONSTRAINT FK_Flight_Destination FOREIGN KEY (Destination_Airport_ID) REFERENCES Airport(Airport_ID)
+);
+
+-- Seat table
+CREATE TABLE Seat (
+    Seat_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Flight_ID INT,
+    Seat_Number NVARCHAR(10) NOT NULL,
+    Class NVARCHAR(50),
+    Availability NVARCHAR(50),
+    CONSTRAINT FK_Seat_Flight FOREIGN KEY (Flight_ID) REFERENCES Flight(Flight_ID)
+);
+
+
+CREATE TABLE Booking (
+    Booking_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Passenger_ID INT,
+    Flight_ID INT,
+    Booking_Date DATETIME,
+    Total_Amount DECIMAL(10,2),
+    Status NVARCHAR(50),
+    CONSTRAINT FK_Booking_Passenger FOREIGN KEY (Passenger_ID) REFERENCES Passenger(Passenger_ID),
+    CONSTRAINT FK_Booking_Flight FOREIGN KEY (Flight_ID) REFERENCES Flight(Flight_ID)
+);
+
+
+-- Payment table
+CREATE TABLE Payment (
+    Payment_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Booking_ID INT,
+    Payment_Method NVARCHAR(50),
+    Amount DECIMAL(10,2),
+    Payment_Date DATETIME,
+    Status NVARCHAR(50),
+    CONSTRAINT FK_Payment_Booking FOREIGN KEY (Booking_ID) REFERENCES Booking(Booking_ID)
+);
+
+
+
+ Dashboard Code
+
+
+ private void Dashboard_Load(object sender, EventArgs e)
+        {
+            display1();
+            display2();
+            display3();
+            display4();
+           
+        }
+
+        private void display1()
+        {
+            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=CafeDB;Integrated Security=True;TrustServerCertificate=True");
+            con.Open();
+            SqlCommand comm = new SqlCommand("SELECT COUNT(*) FROM customers", con);
+            Int32 count = Convert.ToInt32(comm.ExecuteScalar());
+            if (count > 0)
+            {
+                lblCount1.Text = Convert.ToString(count.ToString()); //For example a Label
+            }
+            else
+            {
+                lblCount1.Text = "0";
+            }
+            con.Close(); //Remember close the connection
+        }
+
+        private void display2()
+        {
+            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=CafeDB;Integrated Security=True;TrustServerCertificate=True");
+            con.Open();
+            SqlCommand comm = new SqlCommand("SELECT COUNT(*) FROM orders", con);
+            Int32 count = Convert.ToInt32(comm.ExecuteScalar());
+            if (count > 0)
+            {
+                lblCount2.Text = Convert.ToString(count.ToString()); //For example a Label
+            }
+            else
+            {
+                lblCount2.Text = "0";
+            }
+            con.Close(); //Remember close the connection
+        }
+
+        private void display3()
+        {
+            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=CafeDB;Integrated Security=True;TrustServerCertificate=True");
+            con.Open();
+            SqlCommand comm = new SqlCommand("SELECT COUNT(*) FROM products", con);
+            Int32 count = Convert.ToInt32(comm.ExecuteScalar());
+            if (count > 0)
+            {
+                lblCount3.Text = Convert.ToString(count.ToString()); //For example a Label
+            }
+            else
+            {
+                lblCount3.Text = "0";
+            }
+            con.Close(); //Remember close the connection
+        }
+
+        private void display4()
+        {
+            SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-DASLLN7;Initial Catalog=CafeDB;Integrated Security=True;TrustServerCertificate=True");
+            con.Open();
+            SqlCommand comm = new SqlCommand("SELECT COUNT(*) FROM waiters", con);
+            Int32 count = Convert.ToInt32(comm.ExecuteScalar());
+            if (count > 0)
+            {
+                lblCount4.Text = Convert.ToString(count.ToString()); //For example a Label
+            }
+            else
+            {
+                lblCount4.Text = "0";
+            }
+            con.Close(); //Remember close the connection
+        }
